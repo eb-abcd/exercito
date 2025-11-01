@@ -1,130 +1,170 @@
-// === SUPABASE CONFIGURAÇÃO ===
+// ==========================
+// === CONFIG SUPABASE ===
+// ==========================
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-const SUPABASE_URL = "https://vwnzmmyoesrjqpthsstg.supabase.co";
-const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ3bnptbXlvZXNyanFwdGhzc3RnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE5NTIyMTAsImV4cCI6MjA3NzUyODIxMH0.F6z3GoZbC-htwzOZSlOnwZUbVOSbgCSbeFE1qskQihw";
-
+const SUPABASE_URL = "https://YOUR-PROJECT.supabase.co";
+const SUPABASE_KEY = "YOUR-ANON-KEY";
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// === ELEMENTOS DO FORMULÁRIO ===
-const form = document.getElementById("formInscricao");
-const notifOverlay = document.getElementById("notifOverlay");
-const notifClose = document.getElementById("notifClose");
-
-// === ENVIO DO FORMULÁRIO ===
+// ==========================
+// === FORMULÁRIO ENVIO ===
+// ==========================
+const form = document.querySelector("#formulario");
 if (form) {
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
 
-    // coleta dos valores
-    const nome = document.getElementById("nome").value.trim();
-    const idade = document.getElementById("idade").value.trim();
-    const documento = document.getElementById("documento").value.trim();
-    const telefone = document.getElementById("telefone").value.trim();
-    const email = document.getElementById("email").value.trim();
-    const area = document.getElementById("area").value;
-    const motivo = document.getElementById("motivo").value;
-    const descricao = document.getElementById("descricao").value.trim();
+    const data = {
+      nome: form.nome.value.trim(),
+      idade: form.idade.value.trim(),
+      cpf: form.cpf.value.trim(),
+      telefone: form.telefone.value.trim(),
+      area: form.area.value.trim(),
+      motivo: form.motivo.value.trim(),
+      observacao: form.observacao.value.trim(),
+      created_at: new Date().toISOString(),
+    };
 
-    // validações básicas
-    if (!nome || !idade || !documento || !telefone || !email || !area || !motivo) {
+    if (!data.nome || !data.idade || !data.cpf || !data.telefone) {
       showAlert("Por favor, preencha todos os campos obrigatórios.");
       return;
     }
 
-    try {
-      // insere no Supabase
-      const { data, error } = await supabase
-        .from("inscricoes")
-        .insert([{ nome, idade, documento, telefone, email, area, motivo, descricao }]);
-
-      if (error) throw error;
-
-      // sucesso visual
+    const { error } = await supabase.from("formularios").insert([data]);
+    if (error) {
+      console.error(error);
+      showAlert("Erro ao enviar formulário.");
+    } else {
+      showNotification("Formulário enviado com sucesso!");
       form.reset();
-      showNotification();
-
-    } catch (err) {
-      console.error("Erro ao enviar inscrição:", err);
-      showAlert("Ocorreu um erro ao enviar sua inscrição. Tente novamente mais tarde.");
     }
   });
 }
 
-// === NOTIFICAÇÃO DE SUCESSO ===
-function showNotification() {
-  if (!notifOverlay) return;
-  notifOverlay.classList.add("show");
-  notifOverlay.removeAttribute("aria-hidden");
+// ==========================
+// === LOGIN ADMIN ===
+// ==========================
+const loginBtn = document.querySelector("#loginBtn");
+const popup = document.querySelector("#loginPopup");
+const popupForm = document.querySelector("#loginForm");
+const adminPanel = document.querySelector("#adminPanel");
+
+const ADMIN_USER = "admin";
+const ADMIN_PASS = "12345"; // 🔐 defina sua senha real aqui
+
+if (loginBtn) {
+  loginBtn.addEventListener("click", () => popup.classList.add("show"));
 }
 
-if (notifClose) {
-  notifClose.addEventListener("click", () => {
-    notifOverlay.classList.remove("show");
-    notifOverlay.setAttribute("aria-hidden", "true");
+if (popupForm) {
+  popupForm.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const user = popupForm.querySelector("#user").value.trim();
+    const pass = popupForm.querySelector("#password").value.trim();
+
+    if (user === ADMIN_USER && pass === ADMIN_PASS) {
+      localStorage.setItem("isAdmin", "true");
+      popup.classList.remove("show");
+      showNotification("Login realizado com sucesso!");
+      loadAdminData();
+    } else {
+      showAlert("Usuário ou senha incorretos.");
+    }
   });
 }
 
-// === ALERTA BONITO ===
-function showAlert(message) {
-  const overlay = document.createElement("div");
-  overlay.className = "custom-alert";
+// Impede acesso manual via localStorage
+window.addEventListener("DOMContentLoaded", () => {
+  const isAdmin = localStorage.getItem("isAdmin") === "true";
+  if (adminPanel && isAdmin) {
+    loadAdminData();
+  } else if (adminPanel && !isAdmin) {
+    adminPanel.innerHTML = `<div class="form-error">⚠️ Acesso negado. Faça login primeiro.</div>`;
+  }
+});
 
-  const card = document.createElement("div");
-  card.className = "custom-alert-card";
-  card.innerHTML = `
-    <p>${message}</p>
-    <button class="btn-outline-success">OK</button>
+// ==========================
+// === ADMIN PANEL ===
+// ==========================
+async function loadAdminData() {
+  if (!adminPanel) return;
+  const { data, error } = await supabase.from("formularios").select("*").order("created_at", { ascending: false });
+
+  if (error) {
+    console.error(error);
+    adminPanel.innerHTML = "<p>Erro ao carregar dados.</p>";
+    return;
+  }
+
+  if (!data.length) {
+    adminPanel.innerHTML = "<p>Nenhum formulário encontrado.</p>";
+    return;
+  }
+
+  adminPanel.innerHTML = `
+    <h3>📋 Formulários Recebidos</h3>
+    <div class="cards-grid">
+      ${data.map(item => `
+        <div class="admin-card">
+          <p><b>Nome:</b> ${item.nome}</p>
+          <p><b>Idade:</b> ${item.idade}</p>
+          <p><b>CPF:</b> ${item.cpf}</p>
+          <p><b>Telefone:</b> ${item.telefone}</p>
+          <p><b>Área:</b> ${item.area}</p>
+          <p><b>Motivo:</b> ${item.motivo}</p>
+          <p><b>Data:</b> ${new Date(item.created_at).toLocaleString()}</p>
+          <button class="btn-outline-success delete-btn" data-id="${item.id}">Apagar</button>
+        </div>
+      `).join("")}
+    </div>
   `;
 
-  overlay.appendChild(card);
-  document.body.appendChild(overlay);
+  // Adiciona listeners de exclusão
+  document.querySelectorAll(".delete-btn").forEach(btn => {
+    btn.addEventListener("click", async () => {
+      const id = btn.dataset.id;
+      const confirmDel = confirm("Deseja realmente apagar este formulário?");
+      if (!confirmDel) return;
 
-  const button = card.querySelector("button");
-  button.addEventListener("click", () => overlay.remove());
-}
-
-// === BOTÃO LOGIN (CASO EXISTA NO NAVBAR) ===
-const btnEntrar = document.getElementById("btnEntrar");
-if (btnEntrar) {
-  btnEntrar.addEventListener("click", () => {
-    window.location.href = "admin.html";
+      const { error } = await supabase.from("formularios").delete().eq("id", id);
+      if (error) {
+        showAlert("Erro ao apagar registro.");
+      } else {
+        showNotification("Registro apagado com sucesso!");
+        loadAdminData();
+      }
+    });
   });
 }
 
-// === ADMIN PANEL (caso o mesmo arquivo seja usado em admin.html) ===
-const adminContainer = document.getElementById("adminContainer");
-if (adminContainer) {
-  carregarInscricoes();
+// ==========================
+// === NOTIFICAÇÕES ===
+// ==========================
+function showNotification(msg) {
+  let overlay = document.createElement("div");
+  overlay.className = "notif-overlay show";
+  overlay.innerHTML = `
+    <div class="notif-card">
+      <img src="https://cdn-icons-png.flaticon.com/512/845/845646.png" alt="check" />
+      <h4>Sucesso!</h4>
+      <p>${msg}</p>
+      <button id="notifClose">Fechar</button>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+  overlay.querySelector("#notifClose").addEventListener("click", () => overlay.remove());
 }
 
-async function carregarInscricoes() {
-  try {
-    const { data, error } = await supabase.from("inscricoes").select("*").order("id", { ascending: false });
-    if (error) throw error;
-
-    if (!data || data.length === 0) {
-      adminContainer.innerHTML = "<p>Nenhuma inscrição encontrada.</p>";
-      return;
-    }
-
-    adminContainer.innerHTML = `
-      <div class="cards-grid">
-        ${data.map(item => `
-          <div class="admin-card">
-            <h4>${item.nome}</h4>
-            <p><b>Idade:</b> ${item.idade}</p>
-            <p><b>Área:</b> ${item.area}</p>
-            <p><b>Motivo:</b> ${item.motivo}</p>
-            <p><b>Email:</b> ${item.email}</p>
-            <p><b>Telefone:</b> ${item.telefone}</p>
-            ${item.descricao ? `<p><b>Descrição:</b> ${item.descricao}</p>` : ""}
-          </div>
-        `).join("")}
-      </div>
-    `;
-  } catch (err) {
-    console.error("Erro ao carregar inscrições:", err);
-    adminContainer.innerHTML = "<p>Erro ao carregar dados.</p>";
-  }
+function showAlert(msg) {
+  let alert = document.createElement("div");
+  alert.className = "custom-alert";
+  alert.innerHTML = `
+    <div class="custom-alert-card">
+      <p>${msg}</p>
+      <button class="btn-outline-success" id="alertClose">Fechar</button>
+    </div>
+  `;
+  document.body.appendChild(alert);
+  alert.querySelector("#alertClose").addEventListener("click", () => alert.remove());
 }
