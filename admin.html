@@ -4,16 +4,14 @@
   <meta charset="utf-8">
   <link rel="icon" type="image/png" href="assets/logo.png">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Admin</title>
+  <title>Painel Administrativo</title>
   <link rel="stylesheet" href="style.css">
-  <!-- Adicione o client do Supabase -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script type="module" src="script.js"></script>
+  <script defer src="script.js"></script>
 </head>
 <body>
   <div style="padding:14px;background:#fff;display:flex;gap:10px;align-items:center;justify-content:flex-start">
     <button id="btnVoltar" class="btn-outline-success">Voltar</button>
-    <button id="btnExcluir" class="btn-outline-success" style="background:#d9534f;color:#fff">Excluir</button>
+    <button id="btnExcluirSelecionados" class="btn-outline-success" style="background:#d9534f;color:#fff">Excluir Selecionados</button>
 
     <select id="filtroArea" class="btn-outline-success" style="margin-left:auto">
       <option value="todos">TODOS</option>
@@ -25,8 +23,6 @@
 
   <main class="container">
     <h2>Painel Administrativo</h2>
-    <!-- 🔽 ADICIONE ESTA LINHA -->
-    <p id="status" style="color:#555">Carregando dados...</p>
     <div id="cardsContainer" class="cards-grid"></div>
   </main>
 </body>
