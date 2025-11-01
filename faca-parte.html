@@ -1,74 +1,70 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Faça Parte • Ministério da Defesa</title>
-  <link rel="stylesheet" href="style.css" />
-  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Faça Parte</title>
+  <link rel="stylesheet" href="style.css">
   <script defer src="script.js"></script>
 </head>
 <body>
-  <header>
-    <div class="logo-area">
-      <img src="logo.png" alt="Logo Ministério da Defesa" class="logo" />
-      <h1>Ministério da Defesa</h1>
+
+  <nav class="navbar">
+    <div class="brand">
+      <img src="assets/logo.png" alt="logo">
+      <span class="min">| Ministério da Defesa</span>
     </div>
-    <nav>
-      <a href="index.html">Início</a>
-      <a href="quem-somos.html">Quem Somos</a>
-      <a href="operacoes.html">Operações</a>
-      <a href="hierarquia.html">Hierarquia</a>
-      <a class="ativo" href="faca-parte.html">Faça Parte</a>
-    </nav>
-    <button id="btnEntrar">Entrar</button>
-  </header>
+    <ul class="nav-links">
+      <li><a class="nav-link" href="index.html">Início</a></li>
+      <li><a class="nav-link" href="quem-somos.html">Quem Somos</a></li>
+      <li><a class="nav-link" href="operacoes.html">Operações</a></li>
+      <li><a class="nav-link" href="hierarquia.html">Hierarquia</a></li>
+      <li><a class="nav-link active" href="faca-parte.html">Faça Parte</a></li>
+    </ul>
+    <button id="btnEntrar" class="btn-outline-success">Entrar</button>
+  </nav>
 
-  <main>
-    <h2>Formulário de Alistamento</h2>
-    <form id="formInscricao">
-      <label>Nome completo</label>
-      <input type="text" id="nome" required />
+  <div class="container">
+    <div class="form-card">
+      <h3>Formulário de Alistamento</h3>
+      <form id="formInscricao">
+        <input id="nome" placeholder="Nome" required><br>
+        <input id="idade" placeholder="Idade" type="number" required><br>
+        <input id="documento" placeholder="Documento (ID)" required><br>
+        <input id="telefone" placeholder="Telefone (IN-GAME)" required><br>
+        <input id="email" placeholder="E-mail (ID Discord)" required><br>
 
-      <label>Idade</label>
-      <input type="number" id="idade" required />
+        <label for="area">Qual área?</label>
+        <select id="area" required>
+          <option value="">Selecione</option>
+          <option value="exercito">Exército Brasileiro</option>
+          <option value="fab">Força Aérea Brasileira</option>
+          <option value="marinha">Marinha do Brasil</option>
+        </select>
 
-      <label>Documento (RG ou CPF)</label>
-      <input type="text" id="documento" required />
+        <label for="motivo">Motivo</label>
+        <select id="motivo" required>
+          <option value="">Selecione</option>
+          <option value="servir">Obrigatório</option>
+          <option value="atrasado">Atrasado (até 45 anos)</option>
+          <option value="outros">Outros</option>
+        </select>
 
-      <label>Telefone</label>
-      <input type="text" id="telefone" required />
+        <textarea id="descricao" placeholder="Descreva o motivo"></textarea>
 
-      <label>E-mail</label>
-      <input type="email" id="email" required />
-
-      <label>Qual área?</label>
-      <select id="area" required>
-        <option>Exército Brasileiro</option>
-        <option>Marinha do Brasil</option>
-        <option>Força Aérea Brasileira</option>
-      </select>
-
-      <label>Motivo</label>
-      <select id="motivo" required>
-        <option>Obrigatório</option>
-        <option>Voluntário</option>
-      </select>
-
-      <label>Conte um pouco sobre você</label>
-      <textarea id="descricao" rows="4"></textarea>
-
-      <button type="submit">Enviar</button>
-    </form>
-  </main>
-
-  <!-- Notificação de Sucesso -->
-  <div id="notifOverlay" class="overlay">
-    <div class="notif-card">
-      <h3>Inscrição enviada com sucesso ✅</h3>
-      <p>Entraremos em contato em breve.</p>
-      <button id="notifClose">Fechar</button>
+        <button type="submit" class="btn-outline-success">Enviar</button>
+      </form>
     </div>
   </div>
+
+  <div id="notifOverlay" class="notif-overlay">
+    <div class="notif-card">
+      <img src="assets/logo.png" alt="logo">
+      <h4>Alistamento enviado!</h4>
+      <p>Seu pedido foi registrado com sucesso.</p>
+      <button id="notifClose" class="btn-outline-success">Fechar</button>
+    </div>
+  </div>
+
 </body>
 </html>
