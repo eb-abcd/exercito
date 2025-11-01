@@ -1,59 +1,59 @@
-// ====== CONEXÃO SUPABASE ======
-const SUPABASE_URL = "https://vwnzmmyoesrjqpthsstg.supabase.co";
-const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ3bnptbXlvZXNyanFwdGhzc3RnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE5NTIyMTAsImV4cCI6MjA3NzUyODIxMH0.F6z3GoZbC-htwzOZSlOnwZUbVOSbgCSbeFE1qskQihw";
-const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+// =================== CONFIG ===================
+const ADMIN_PASS = "1822br";
+const STORAGE_KEY = "inscricoesMilitares";
 
-// ====== FORMULÁRIO ======
+// =================== FUNÇÃO SALVAR FORM ===================
+function salvarInscricao(data) {
+  const inscricoes = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+  inscricoes.push(data);
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(inscricoes));
+}
+
+// =================== FORMULÁRIO (FAÇA PARTE) ===================
 document.addEventListener("DOMContentLoaded", () => {
   const form = document.getElementById("formInscricao");
-  if (form) {
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault();
-
-      const nome = document.getElementById("nome").value.trim();
-      const idade = document.getElementById("idade").value.trim();
-      const documento = document.getElementById("documento").value.trim();
-      const telefone = document.getElementById("telefone").value.trim();
-      const email = document.getElementById("email").value.trim();
-      const area = document.getElementById("area").value.trim();
-      const motivo = document.getElementById("motivo").value.trim();
-      const descricao = document.getElementById("descricao").value.trim();
-
-      try {
-        const { error } = await supabaseClient
-          .from("inscricoes")
-          .insert([{ nome, idade, documento, telefone, email, area, motivo, descricao }]);
-
-        if (error) throw error;
-
-        // Mostra notificação
-        const overlay = document.getElementById("notifOverlay");
-        if (overlay) overlay.style.display = "flex";
-
-        form.reset();
-      } catch (err) {
-        console.error("Erro ao enviar:", err);
-        alert("Erro ao enviar inscrição!");
-      }
-    });
-  }
-
+  const notif = document.getElementById("notifOverlay");
   const notifClose = document.getElementById("notifClose");
-  if (notifClose) {
-    notifClose.addEventListener("click", () => {
-      document.getElementById("notifOverlay").style.display = "none";
+  const btnEntrar = document.getElementById("btnEntrar");
+  const btnSair = document.getElementById("btnSair");
+  const tabela = document.getElementById("tabelaInscricoes")?.querySelector("tbody");
+
+  // ========= FORM SUBMIT =========
+  if (form) {
+    form.addEventListener("submit", e => {
+      e.preventDefault();
+      const data = {
+        nome: form.querySelector("#nome").value.trim(),
+        idade: form.querySelector("#idade").value.trim(),
+        documento: form.querySelector("#documento").value.trim(),
+        telefone: form.querySelector("#telefone").value.trim(),
+        email: form.querySelector("#email").value.trim(),
+        area: form.querySelector("#area").value,
+        motivo: form.querySelector("#motivo").value,
+        descricao: form.querySelector("#descricao")?.value.trim() || ""
+      };
+      salvarInscricao(data);
+
+      // Mostra notificação de sucesso
+      if (notif) {
+        notif.classList.add("show");
+        notif.querySelector("h4").textContent = "Alistamento enviado!";
+      }
+      form.reset();
     });
   }
-});
 
-// ====== LOGIN ADMIN ======
-document.addEventListener("DOMContentLoaded", async () => {
-  const btnEntrar = document.getElementById("btnEntrar");
+  // ========= FECHAR NOTIF =========
+  if (notifClose) {
+    notifClose.addEventListener("click", () => notif.classList.remove("show"));
+  }
+
+  // ========= LOGIN (BOTÃO ENTRAR) =========
   if (btnEntrar) {
     btnEntrar.addEventListener("click", () => {
       const senha = prompt("Digite a senha de administrador:");
-      if (senha === "1822br") {
-        localStorage.setItem("adminLogado", "true");
+      if (senha === ADMIN_PASS) {
+        sessionStorage.setItem("adminAuth", "true");
         window.location.href = "admin.html";
       } else {
         alert("Senha incorreta!");
@@ -61,64 +61,52 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   }
 
-  if (window.location.pathname.includes("admin.html")) {
-    await new Promise(resolve => {
-      const check = setInterval(() => {
-        if (supabaseClient) {
-          clearInterval(check);
-          resolve();
-        }
-      }, 100);
+  // ========= SAIR (PAINEL ADMIN) =========
+  if (btnSair) {
+    btnSair.addEventListener("click", () => {
+      sessionStorage.removeItem("adminAuth");
+      window.location.href = "index.html";
     });
+  }
 
-    if (localStorage.getItem("adminLogado") !== "true") {
-      alert("Acesso negado. Faça login primeiro!");
+  // ========= VERIFICAR LOGIN =========
+  if (window.location.pathname.includes("admin.html")) {
+    if (sessionStorage.getItem("adminAuth") !== "true") {
       window.location.href = "index.html";
       return;
     }
 
     carregarInscricoes();
-  }
 
-  const btnVoltar = document.getElementById("btnVoltar");
-  if (btnVoltar) {
-    btnVoltar.addEventListener("click", () => {
-      localStorage.removeItem("adminLogado");
-      window.location.href = "index.html";
-    });
+    function carregarInscricoes() {
+      tabela.innerHTML = "";
+      const inscricoes = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+
+      inscricoes.forEach((item, index) => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${item.nome}</td>
+          <td>${item.idade}</td>
+          <td>${item.documento}</td>
+          <td>${item.telefone}</td>
+          <td>${item.email}</td>
+          <td>${item.area}</td>
+          <td>${item.motivo}</td>
+          <td>${item.descricao}</td>
+          <td><button class="btn-apagar" data-index="${index}">Excluir</button></td>
+        `;
+        tabela.appendChild(tr);
+      });
+
+      // Eventos de exclusão
+      document.querySelectorAll(".btn-apagar").forEach(btn => {
+        btn.addEventListener("click", e => {
+          const i = e.target.dataset.index;
+          inscricoes.splice(i, 1);
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(inscricoes));
+          carregarInscricoes();
+        });
+      });
+    }
   }
 });
-
-// ====== CARREGAR INSCRIÇÕES ======
-async function carregarInscricoes() {
-  try {
-    const tabelaCorpo = document.getElementById("tabelaCorpo");
-    if (!tabelaCorpo) return;
-
-    const { data, error } = await supabaseClient.from("inscricoes").select("*");
-    if (error) throw error;
-
-    if (!data || data.length === 0) {
-      tabelaCorpo.innerHTML = "<tr><td colspan='8'>Nenhuma inscrição encontrada.</td></tr>";
-      return;
-    }
-
-    tabelaCorpo.innerHTML = "";
-    data.forEach(item => {
-      const row = document.createElement("tr");
-      row.innerHTML = `
-        <td>${item.nome}</td>
-        <td>${item.idade}</td>
-        <td>${item.documento}</td>
-        <td>${item.telefone}</td>
-        <td>${item.email}</td>
-        <td>${item.area}</td>
-        <td>${item.motivo}</td>
-        <td>${item.descricao || "-"}</td>
-      `;
-      tabelaCorpo.appendChild(row);
-    });
-  } catch (err) {
-    console.error("Erro ao carregar inscrições:", err);
-  }
-}
