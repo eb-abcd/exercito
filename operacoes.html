@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <link rel="icon" type="image/png" href="assets/logo.png">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Operações</title>
+
+  <!-- Estilo global (navbar, botões etc.) -->
+  <link rel="stylesheet" href="style.css">
+
+  <!-- Estilo exclusivo da página Quem Somos -->
+  <link rel="stylesheet" href="style-operacoes.css">
+
+  <!-- Script global -->
+  <script defer src="script.js"></script>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="brand">
+      <img src="assets/logo.png" alt="logo">
+      <span class="min">| Ministério da Defesa</span>
+    </div>
+    <ul class="nav-links">
+      <li><a class="nav-link" href="index.html">Início</a></li>
+      <li><a class="nav-link" href="quem-somos.html">Quem Somos</a></li>
+      <li><a class="nav-link active" href="operacoes.html">Operações</a></li>
+      <li><a class="nav-link" href="hierarquia.html">Hierarquia</a></li>
+      <li><a class="nav-link" href="faca-parte.html">Faça Parte</a></li>
+    </ul>
+    <button id="btnEntrar" class="btn-outline-success">Entrar</button>
+  </nav>
+
+  <div class="container operacoes-page">
+    <section class="header-title">
+      <h1>Operações</h1>
+    </section>
+
+    <!-- Banner principal -->
+    <section class="banner-operacao">
+      <img src="assets//operacoes/ope1.png" alt="Operação recente" class="banner-img" />
+      <div class="banner-text">
+        <h1>Operação no São Pedro</h1>
+        <p>Uma operação que visou o combate ao tráfico de drogas e a desordem na comunidade paulista, o exército com apoio de forças especializadas de seguranças fizeram uma operação estratégica para conter o avanço da criminalidade.</p>
+      <button class="btn-outline-success" onclick="window.open('missoes/ope1.html', '_blank')">
+  Saiba mais
+</button>
+
+    </section>
+
+    <!-- Galeria de operações anteriores -->
+    <section class="operacoes-container">
+      <h2>Operações Anteriores</h2>
+      <div class="carousel-wrapper">
+        <button class="carousel-btn left" id="prevBtn" aria-label="Anterior">&#10094;</button>
+
+        <div class="carousel">
+        <div class="card" onclick="window.open('missoes/ope2.html', '_blank')">
+            <img src="assets/operacoes/ope2.png" alt="Batedores do Exército">
+            <h3>Batedores do Exército</h3>
+            <p>O Exército Brasileiro realizou em ABCD um treinamento com o Pelotão de Batedores, focado em reconhecimento, escolta e segurança de comboios. A ação visou aperfeiçoar o preparo e a prontidão operacional das tropas.</p>
+          </div>
+         <div class="card" onclick="window.open('missoes/ope3.html', '_blank')">
+            <img src="assets/operacoes/ope3.png" alt="Operação Ruas Vazias">
+            <h3>Ruas Vazias</h3>
+            <p>Exército realiza a Operação Ruas Vazias e faz a maior apreensão de bombas caseiras do batalhão de batedores em ABCD.</p>
+          </div>
+          <div class="card" onclick="window.open('missoes/ope4.html', '_blank')">
+            <img src="assets/operacoes/ope4.png" alt="Operação Serra Limpa">
+            <h3>Serra Limpa</h3>
+            <p>Exército realiza a Operação Serra Limpa com foco no combate ao tráfico, apoio ao cidadão e preservação ambiental nas fronteiras.</p>
+          </div>
+        </div>
+
+        <button class="carousel-btn right" id="nextBtn" aria-label="Próximo">&#10095;</button>
+      </div>
+
+      <!-- Indicadores -->
+      <div class="carousel-indicators">
+        <span class="dot active"></span>
+        <span class="dot"></span>
+        <span class="dot"></span>
+      </div>
+    </section>
+  </div>
+</body>
+</html>

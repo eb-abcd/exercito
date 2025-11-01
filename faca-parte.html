@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" type="image/png" href="assets/logo.png">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Faça Parte</title>
+  <link rel="stylesheet" href="style.css">
+  <script defer src="script.js"></script>
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="brand">
+      <img src="assets/logo.png" alt="logo">
+      <span class="min">| Ministério da Defesa</span>
+    </div>
+    <ul class="nav-links">
+      <li><a class="nav-link" href="index.html">Início</a></li>
+      <li><a class="nav-link" href="quem-somos.html">Quem Somos</a></li>
+      <li><a class="nav-link" href="operacoes.html">Operações</a></li>
+      <li><a class="nav-link" href="hierarquia.html">Hierarquia</a></li>
+      <li><a class="nav-link active" href="faca-parte.html">Faça Parte</a></li>
+    </ul>
+    <button id="btnEntrar" class="btn-outline-success">Entrar</button>
+  </nav>
+
+  <div class="container">
+    <div class="form-card">
+      <h3>Formulário de Alistamento</h3>
+
+      <form id="formInscricao">
+        <input id="nome" placeholder="Nome" required /><br>
+        <input id="idade" placeholder="Idade" type="number" required /><br>
+        <input id="documento" placeholder="Documento (ID)" required /><br>
+        <input id="telefone" placeholder="Telefone (IN-GAME)" required /><br>
+        <input id="email" placeholder="E-mail (ID Discord)" required /><br>
+
+        <!-- NOVO CAMPO: Qual área -->
+        <label for="area">Qual área?</label>
+        <select id="area" required>
+          <option value="">Selecione</option>
+          <option value="exercito">Exército Brasileiro</option>
+          <option value="fab">Força Aérea Brasileira</option>
+          <option value="marinha">Marinha do Brasil</option>
+        </select>
+
+        <!-- Motivo -->
+        <label for="motivo">Motivo</label>
+        <select id="motivo" required>
+          <option value="">Selecione</option>
+          <option value="servir">Obrigatório</option>
+          <option value="atrasado">Atrasado (até 45 anos)</option>
+          <option value="outros">Outros</option>
+        </select>
+
+        <div id="campoMotivo" class="d-none">
+          <textarea id="descricao" placeholder="Descreva o motivo"></textarea>
+        </div>
+
+        <br>
+        <button type="submit" class="btn-outline-success">Enviar</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Notificação -->
+  <div id="notifOverlay" class="notif-overlay" aria-hidden="true">
+    <div class="notif-card">
+      <img src="assets/logo.png" alt="logo">
+      <h4>Alistamento enviado!</h4>
+      <p>Seu pedido foi registrado com sucesso.</p>
+      <button id="notifClose" class="btn-outline-success">Fechar</button>
+    </div>
+  </div>
+
+</body>
+</html>
