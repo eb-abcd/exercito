@@ -7,61 +7,7 @@
   <title>Faça Parte</title>
   <link rel="stylesheet" href="style.css">
   <script defer src="script.js"></script>
-
-  <!-- 🔗 Script do Supabase -->
-  <script type="module">
-    import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
-
-    // Conexão com o Supabase
-    const SUPABASE_URL = 'https://vwnzmmyoesrjqpthsstg.supabase.co'
-    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ3bnptbXlvZXNyanFwdGhzc3RnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE5NTIyMTAsImV4cCI6MjA3NzUyODIxMH0.F6z3GoZbC-htwzOZSlOnwZUbVOSbgCSbeFE1qskQihw'
-    const supabase = createClient(SUPABASE_URL, SUPABASE_KEY)
-
-    document.addEventListener('DOMContentLoaded', () => {
-      const form = document.getElementById('formInscricao')
-      const notifOverlay = document.getElementById('notifOverlay')
-      const notifClose = document.getElementById('notifClose')
-      const motivoSelect = document.getElementById('motivo')
-      const campoMotivo = document.getElementById('campoMotivo')
-
-      // Mostrar/ocultar campo "outros"
-      motivoSelect.addEventListener('change', () => {
-        campoMotivo.classList.toggle('d-none', motivoSelect.value !== 'outros')
-      })
-
-      // Enviar dados para o Supabase
-      form.addEventListener('submit', async (e) => {
-        e.preventDefault()
-
-        const dados = {
-          nome: document.getElementById('nome').value,
-          idade: document.getElementById('idade').value,
-          documento: document.getElementById('documento').value,
-          telefone: document.getElementById('telefone').value,
-          email: document.getElementById('email').value,
-          area: document.getElementById('area').value,
-          motivo: document.getElementById('motivo').value,
-          descricao: document.getElementById('descricao').value || ''
-        }
-
-        const { error } = await supabase.from('inscricoes').insert([dados])
-
-        if (error) {
-          alert('❌ Erro ao enviar: ' + error.message)
-          console.error(error)
-        } else {
-          notifOverlay.removeAttribute('aria-hidden')
-        }
-      })
-
-      notifClose.addEventListener('click', () => {
-        notifOverlay.setAttribute('aria-hidden', 'true')
-        form.reset()
-      })
-    })
-  </script>
 </head>
-
 <body>
 
   <nav class="navbar">
@@ -126,5 +72,52 @@
     </div>
   </div>
 
+  <!-- 🔗 Conexão Supabase -->
+  <script type="module">
+    import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+
+    const SUPABASE_URL = 'https://vwnzmmyoesrjqpthsstg.supabase.co'
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ3bnptbXlvZXNyanFwdGhzc3RnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE5NTIyMTAsImV4cCI6MjA3NzUyODIxMH0.F6z3GoZbC-htwzOZSlOnwZUbVOSbgCSbeFE1qskQihw'
+    const supabase = createClient(SUPABASE_URL, SUPABASE_KEY)
+
+    const form = document.getElementById('formInscricao')
+    const notifOverlay = document.getElementById('notifOverlay')
+    const notifClose = document.getElementById('notifClose')
+    const motivoSelect = document.getElementById('motivo')
+    const campoMotivo = document.getElementById('campoMotivo')
+
+    motivoSelect.addEventListener('change', () => {
+      campoMotivo.classList.toggle('d-none', motivoSelect.value !== 'outros')
+    })
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault()
+
+      const dados = {
+        nome: document.getElementById('nome').value,
+        idade: document.getElementById('idade').value,
+        documento: document.getElementById('documento').value,
+        telefone: document.getElementById('telefone').value,
+        email: document.getElementById('email').value,
+        area: document.getElementById('area').value,
+        motivo: document.getElementById('motivo').value,
+        descricao: document.getElementById('descricao').value || ''
+      }
+
+      const { error } = await supabase.from('inscricoes').insert([dados])
+
+      if (error) {
+        alert('❌ Erro ao enviar: ' + error.message)
+        console.error(error)
+      } else {
+        notifOverlay.removeAttribute('aria-hidden')
+      }
+    })
+
+    notifClose.addEventListener('click', () => {
+      notifOverlay.setAttribute('aria-hidden', 'true')
+      form.reset()
+    })
+  </script>
 </body>
 </html>
