@@ -4,9 +4,10 @@
   <meta charset="utf-8">
   <link rel="icon" type="image/png" href="assets/logo.png">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Admin</title>
+  <title>Admin • Painel</title>
   <link rel="stylesheet" href="style.css">
-  <script defer src="script.js"></script>
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <script defer src="admin.js"></script>
 </head>
 <body>
   <div style="padding:14px;background:#fff;display:flex;gap:10px;align-items:center;justify-content:flex-start">
@@ -17,13 +18,14 @@
     <select id="filtroArea" class="btn-outline-success" style="margin-left:auto">
       <option value="todos">TODOS</option>
       <option value="exercito">EXÉRCITO</option>
+      <option value="fab">FORÇA AÉREA</option>
       <option value="marinha">MARINHA</option>
-      <option value="forca aerea">FORÇA AÉREA</option>
     </select>
   </div>
 
   <main class="container">
     <h2>Painel Administrativo</h2>
+    <p id="status" class="text-muted">Carregando dados...</p>
     <div id="cardsContainer" class="cards-grid"></div>
   </main>
 </body>
