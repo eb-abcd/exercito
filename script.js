@@ -1,113 +1,93 @@
-document.addEventListener('DOMContentLoaded', function () {
+// Inicializa o Supabase
+const supabaseUrl = "https://vwnzmmyoesrjqpthsstg.supabase.co";
+const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ3bnptbXlvZXNyanFwdGhzc3RnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE5NTIyMTAsImV4cCI6MjA3NzUyODIxMH0.F6z3GoZbC-htwzOZSlOnwZUbVOSbgCSbeFE1qskQihw";
+const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+document.addEventListener("DOMContentLoaded", function () {
   // ------------------------------
   // LOGIN ADMIN POPUP
   // ------------------------------
-  const btnEntrar = document.getElementById('btnEntrar');
-  const popup = document.getElementById('loginPopup');
-  const btnClose = document.getElementById('loginClose');
-  const btnLoginConfirm = document.getElementById('loginConfirm');
+  const btnEntrar = document.getElementById("btnEntrar");
+  const popup = document.getElementById("loginPopup");
+  const btnClose = document.getElementById("loginClose");
+  const btnLoginConfirm = document.getElementById("loginConfirm");
 
   if (btnEntrar && popup) {
-    btnEntrar.addEventListener('click', () => popup.classList.add('show'));
+    btnEntrar.addEventListener("click", () => popup.classList.add("show"));
   }
-
   if (btnClose && popup) {
-    btnClose.addEventListener('click', () => popup.classList.remove('show'));
+    btnClose.addEventListener("click", () => popup.classList.remove("show"));
   }
-
   if (btnLoginConfirm) {
-    btnLoginConfirm.addEventListener('click', () => {
-      const u = document.getElementById('adminUser').value || '';
-      const p = document.getElementById('adminPass').value || '';
+    btnLoginConfirm.addEventListener("click", () => {
+      const u = document.getElementById("adminUser").value || "";
+      const p = document.getElementById("adminPass").value || "";
 
-      if (u === 'Admin' && p === '1822br') {
-        sessionStorage.setItem('adminLogado', 'true');
-        popup.classList.remove('show');
-        window.location.href = 'admin.html';
+      if (u === "Admin" && p === "1822br") {
+        sessionStorage.setItem("adminLogado", "true");
+        popup.classList.remove("show");
+        window.location.href = "admin.html";
       } else {
-        alert('Credenciais incorretas');
+        alert("Credenciais incorretas");
       }
-    });
-  }
-
-  // ------------------------------
-  // FAÇA PARTE ABRIR NOVA GUIA
-  // ------------------------------
-  const facaParteLink = document.querySelector('a[href="faca-parte.html"]');
-  if (facaParteLink) {
-    facaParteLink.addEventListener('click', (e) => {
-      e.preventDefault();
-      window.open('faca-parte.html', '_blank');
     });
   }
 
   // ------------------------------
   // FORMULÁRIO "FAÇA PARTE"
   // ------------------------------
-  const form = document.getElementById('formInscricao');
+  const form = document.getElementById("formInscricao");
   if (form) {
-    const motivoSel = document.getElementById('motivo');
-    const campoMotivo = document.getElementById('campoMotivo');
-    const notif = document.getElementById('notifOverlay');
-    const notifClose = document.getElementById('notifClose');
-    const areaSel = document.getElementById('area');
+    const motivoSel = document.getElementById("motivo");
+    const campoMotivo = document.getElementById("campoMotivo");
+    const notif = document.getElementById("notifOverlay");
+    const notifClose = document.getElementById("notifClose");
+    const areaSel = document.getElementById("area");
 
-    form.setAttribute('novalidate', 'true');
+    form.setAttribute("novalidate", "true");
 
-    motivoSel.addEventListener('change', () => {
-      if (motivoSel.value === 'outros')
-        campoMotivo.classList.remove('d-none');
-      else
-        campoMotivo.classList.add('d-none');
+    motivoSel.addEventListener("change", () => {
+      if (motivoSel.value === "outros")
+        campoMotivo.classList.remove("d-none");
+      else campoMotivo.classList.add("d-none");
     });
 
-    form.addEventListener('submit', function (e) {
+    form.addEventListener("submit", async function (e) {
       e.preventDefault();
 
       const data = {
-        nome: document.getElementById('nome').value.trim(),
-        idade: document.getElementById('idade').value.trim(),
-        documento: document.getElementById('documento').value.trim(),
-        telefone: document.getElementById('telefone').value.trim(),
-        email: document.getElementById('email').value.trim(),
-        area: areaSel ? areaSel.value : '',
+        nome: document.getElementById("nome").value.trim(),
+        idade: document.getElementById("idade").value.trim(),
+        documento: document.getElementById("documento").value.trim(),
+        telefone: document.getElementById("telefone").value.trim(),
+        email: document.getElementById("email").value.trim(),
+        area: areaSel ? areaSel.value : "",
         motivo: motivoSel.value,
-        descricao: document.getElementById('descricao').value.trim(),
-        enviadoEm: new Date().toISOString()
+        descricao: document.getElementById("descricao").value.trim(),
+        enviado_em: new Date().toISOString(),
       };
 
       if (!data.nome || !data.documento || !data.email || !data.area) {
-        const oldMsg = document.querySelector('.form-error');
-        if (oldMsg) oldMsg.remove();
-
-        const msg = document.createElement('div');
-        msg.className = 'form-error';
-        msg.textContent = 'Por favor, preencha todos os dados obrigatórios.';
-
-        const submitBtn = form.querySelector('button[type="submit"]');
-        submitBtn.insertAdjacentElement('afterend', msg);
-
-        setTimeout(() => msg.remove(), 3000);
+        showAlert("Por favor, preencha todos os dados obrigatórios.");
         return;
       }
 
-      const arr = JSON.parse(localStorage.getItem('inscricoes') || '[]');
-      arr.push(data);
-      localStorage.setItem('inscricoes', JSON.stringify(arr));
+      const { error } = await supabase.from("inscricoes").insert([data]);
+      if (error) {
+        console.error("Erro ao enviar:", error);
+        showAlert("Erro ao enviar inscrição. Tente novamente.");
+        return;
+      }
 
-      if (notif) notif.classList.add('show');
-
+      if (notif) notif.classList.add("show");
       form.reset();
-      campoMotivo.classList.add('d-none');
+      campoMotivo.classList.add("d-none");
     });
 
     if (notifClose) {
-      notifClose.addEventListener('click', () => {
-        const notif = document.getElementById('notifOverlay');
-        notif.classList.remove('show');
-        setTimeout(() => {
-          window.close();
-        }, 400);
+      notifClose.addEventListener("click", () => {
+        notif.classList.remove("show");
+        setTimeout(() => window.close(), 400);
       });
     }
   }
@@ -115,191 +95,165 @@ document.addEventListener('DOMContentLoaded', function () {
   // ------------------------------
   // PÁGINA ADMIN
   // ------------------------------
-  if (window.location.pathname.split('/').pop() === 'admin.html') {
-    if (sessionStorage.getItem('adminLogado') !== 'true') {
-      alert('Acesso restrito: faça login.');
-      window.location.href = 'index.html';
+  if (window.location.pathname.split("/").pop() === "admin.html") {
+    if (sessionStorage.getItem("adminLogado") !== "true") {
+      alert("Acesso restrito: faça login.");
+      window.location.href = "index.html";
       return;
     }
 
-    const container = document.getElementById('cardsContainer');
-    const filtro = document.getElementById('filtroArea');
-    const dados = JSON.parse(localStorage.getItem('inscricoes') || '[]');
+    const container = document.getElementById("cardsContainer");
+    const filtro = document.getElementById("filtroArea");
 
-    function renderCards(filtroSelecionado = 'todos') {
-      container.innerHTML = '';
+    async function carregarDados(filtroSelecionado = "todos") {
+      const { data, error } = await supabase.from("inscricoes").select("*").order("id", { ascending: false });
+      if (error) {
+        console.error("Erro ao carregar dados:", error);
+        return;
+      }
+
+      container.innerHTML = "";
 
       const filtrados =
-        filtroSelecionado === 'todos'
-          ? dados
-          : dados.filter(
-              (d) => (d.area || '').toLowerCase() === filtroSelecionado
+        filtroSelecionado === "todos"
+          ? data
+          : data.filter(
+              (d) => (d.area || "").toLowerCase() === filtroSelecionado
             );
 
       if (filtrados.length === 0) {
-        container.innerHTML = '<p class="text-muted">Nenhum registro.</p>';
+        container.innerHTML = "<p class='text-muted'>Nenhum registro.</p>";
         return;
       }
 
       filtrados.forEach((d) => {
-        const div = document.createElement('div');
-        div.className = 'admin-card';
+        const div = document.createElement("div");
+        div.className = "admin-card";
         div.innerHTML = `
           <h5 style="color:#4b5320">${escapeHtml(d.nome)}</h5>
           <p><b>Idade:</b> ${escapeHtml(d.idade)}</p>
           <p><b>ID:</b> ${escapeHtml(d.documento)}</p>
           <p><b>Tel:</b> ${escapeHtml(d.telefone)}</p>
           <p><b>Email:</b> ${escapeHtml(d.email)}</p>
-          <p><b>Onde quer servir:</b> ${escapeHtml(d.area || 'Não informado')}</p>
+          <p><b>Onde quer servir:</b> ${escapeHtml(d.area || "Não informado")}</p>
           <p><b>Motivo:</b> ${escapeHtml(d.motivo)} ${
-          d.descricao ? ' - ' + escapeHtml(d.descricao) : ''
+          d.descricao ? " - " + escapeHtml(d.descricao) : ""
         }</p>
           <p style="font-size:12px;color:#666"><b>Enviado:</b> ${new Date(
-            d.enviadoEm
+            d.enviado_em
           ).toLocaleString()}</p>
         `;
         container.appendChild(div);
       });
     }
 
-    renderCards();
+    carregarDados();
 
     if (filtro) {
-      filtro.addEventListener('change', () => {
-        renderCards(filtro.value);
-      });
+      filtro.addEventListener("change", () => carregarDados(filtro.value));
     }
 
     // ------------------------------
-    // EXPORTAR E EXCLUIR REGISTROS
+    // REALTIME (atualização automática)
     // ------------------------------
-    const btnExcluir = document.getElementById('btnExcluir');
-    if (btnExcluir) {
-      btnExcluir.addEventListener('click', () => {
-        if (!confirm('Deseja exportar e excluir todos os registros?')) return;
+    supabase
+      .channel("inscricoes-change")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "inscricoes" },
+        (payload) => {
+          console.log("Mudança detectada:", payload);
+          carregarDados(filtro ? filtro.value : "todos");
+        }
+      )
+      .subscribe();
 
-        const all = JSON.parse(localStorage.getItem('inscricoes') || '[]');
-        if (all.length === 0) {
-          alert('Nenhum registro para exportar.');
+    // ------------------------------
+    // EXPORTAR REGISTROS
+    // ------------------------------
+    const btnExcluir = document.getElementById("btnExcluir");
+    if (btnExcluir) {
+      btnExcluir.addEventListener("click", async () => {
+        const { data, error } = await supabase.from("inscricoes").select("*");
+        if (error || !data.length) {
+          showAlert("Nenhum registro para exportar.");
           return;
         }
 
-        const txt = all
+        const txt = data
           .map((d) => {
-            return `Nome: ${d.nome || ''}
-Idade: ${d.idade || ''}
+            return `Nome: ${d.nome || ""}
+Idade: ${d.idade || ""}
 
-ID: ${d.documento || ''}
+ID: ${d.documento || ""}
 
-Tel: ${d.telefone || ''}
+Tel: ${d.telefone || ""}
 
-Email: ${d.email || ''}
+Email: ${d.email || ""}
 
-Onde quer servir: ${d.area || 'Não informado'}
+Onde quer servir: ${d.area || "Não informado"}
 
-Motivo: ${d.motivo || ''}${
-              d.descricao ? ' - ' + d.descricao : ''
-            }
+Motivo: ${d.motivo || ""}${d.descricao ? " - " + d.descricao : ""}
 
-Enviado: ${new Date(d.enviadoEm).toLocaleString()}
+Enviado: ${new Date(d.enviado_em).toLocaleString()}
 
-------------------------------
-`;
+------------------------------`;
           })
-          .join('\n');
+          .join("\n\n");
 
-        const blob = new Blob([txt], { type: 'text/plain' });
-        const a = document.createElement('a');
+        const blob = new Blob([txt], { type: "text/plain" });
+        const a = document.createElement("a");
         a.href = URL.createObjectURL(blob);
-        a.download =
-          'backup_inscricoes_' + new Date().toISOString().slice(0, 10) + '.txt';
-        document.body.appendChild(a);
+        a.download = "backup_inscricoes_" + new Date().toISOString().slice(0, 10) + ".txt";
         a.click();
-        a.remove();
 
-        localStorage.removeItem('inscricoes');
-        alert('Registros exportados e excluídos com sucesso.');
-        window.location.reload();
+        await supabase.from("inscricoes").delete().neq("id", 0);
+        showAlert("Registros exportados e excluídos com sucesso.");
+        carregarDados();
       });
     }
 
-    const btnVoltar = document.getElementById('btnVoltar');
+    const btnVoltar = document.getElementById("btnVoltar");
     if (btnVoltar) {
-      btnVoltar.addEventListener('click', () => {
-        sessionStorage.removeItem('adminLogado');
-        window.location.href = 'index.html';
+      btnVoltar.addEventListener("click", () => {
+        sessionStorage.removeItem("adminLogado");
+        window.location.href = "index.html";
       });
     }
   }
 
   // ------------------------------
-  // PROTEÇÃO HTML
+  // ESCAPE HTML
   // ------------------------------
   function escapeHtml(s) {
-    return String(s || '').replace(/[&<>"']/g, (c) =>
+    return String(s || "").replace(/[&<>"']/g, (c) =>
       ({
-        '&': '&amp;',
-        '<': '&lt;',
-        '>': '&gt;',
-        '"': '&quot;',
-        "'": '&#39;'
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;",
       }[c])
     );
   }
 });
 
 // ------------------------------
-// CARROSSEL DE OPERAÇÕES
+// ALERTA BONITO
 // ------------------------------
-const carousel = document.querySelector('.carousel');
-const prevBtn = document.getElementById('prevBtn');
-const nextBtn = document.getElementById('nextBtn');
-const dots = document.querySelectorAll('.carousel-indicators .dot');
-
-if (carousel && prevBtn && nextBtn && dots.length > 0) {
-  let currentPage = 0;
-  const cardWidth = 325;
-  const visibleCards = Math.floor(carousel.offsetWidth / cardWidth);
-  const totalPages = Math.ceil(carousel.children.length / visibleCards);
-
-  function updateCarousel() {
-    const scrollPos = currentPage * cardWidth * visibleCards;
-    carousel.scrollTo({ left: scrollPos, behavior: 'smooth' });
-    dots.forEach((dot, i) => dot.classList.toggle('active', i === currentPage));
-  }
-
-  prevBtn.addEventListener('click', () => {
-    currentPage = currentPage > 0 ? currentPage - 1 : totalPages - 1;
-    updateCarousel();
-  });
-
-  nextBtn.addEventListener('click', () => {
-    currentPage = currentPage < totalPages - 1 ? currentPage + 1 : 0;
-    updateCarousel();
-  });
-
-  dots.forEach((dot, i) => {
-    dot.addEventListener('click', () => {
-      currentPage = i;
-      updateCarousel();
-    });
-  });
-}
-
-/* === Função de alerta bonito (substitui alert nativo) === */
 function showAlert(message) {
-  const overlay = document.createElement('div');
-  overlay.className = 'custom-alert';
+  const overlay = document.createElement("div");
+  overlay.className = "custom-alert";
 
-  const card = document.createElement('div');
-  card.className = 'custom-alert-card';
+  const card = document.createElement("div");
+  card.className = "custom-alert-card";
 
-  const msg = document.createElement('p');
+  const msg = document.createElement("p");
   msg.textContent = message;
 
-  const btn = document.createElement('button');
-  btn.className = 'btn-outline-success';
-  btn.textContent = 'Fechar';
+  const btn = document.createElement("button");
+  btn.className = "btn-outline-success";
+  btn.textContent = "Fechar";
   btn.onclick = () => overlay.remove();
 
   card.appendChild(msg);
