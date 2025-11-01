@@ -1,84 +1,80 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Painel Administrativo</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <nav class="navbar">
-    <div class="brand">
-      <img src="assets/logo.png" alt="Logo">
-      <span class="min">| Ministério da Defesa</span>
-    </div>
-    <button id="btnSair" class="btn-outline-success">Sair</button>
-  </nav>
+  <header class="navbar">
+    <h1>Administração</h1>
+    <a href="index.html" class="logout-btn">Sair</a>
+  </header>
 
-  <div class="container">
-    <h2 class="header-title">Administração</h2>
-    <div class="card">
-      <h3>Inscrições Recebidas</h3>
-      <table id="tabelaInscricoes">
-        <thead>
-          <tr>
-            <th>Nome</th>
-            <th>Idade</th>
-            <th>Documento</th>
-            <th>Telefone</th>
-            <th>Email</th>
-            <th>Área</th>
-            <th>Motivo</th>
-            <th>Descrição</th>
-            <th>Ações</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr><td colspan="9" style="text-align:center;">Carregando...</td></tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
+  <main class="painel">
+    <h2>Inscrições Recebidas</h2>
+    <table id="tabelaInscricoes">
+      <thead>
+        <tr>
+          <th>Nome</th>
+          <th>Idade</th>
+          <th>Documento</th>
+          <th>Telefone</th>
+          <th>Email</th>
+          <th>Área</th>
+          <th>Motivo</th>
+          <th>Descrição</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </main>
 
-  <style>
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      background: #fff;
-      border-radius: 10px;
-      overflow: hidden;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.06);
-      margin-top: 20px;
-    }
-    th, td {
-      padding: 10px 14px;
-      border-bottom: 1px solid #ddd;
-      text-align: left;
-    }
-    th {
-      background: #808000;
-      color: #fff;
-      font-weight: 600;
-    }
-    tr:hover td {
-      background: #f9f9f9;
-    }
-    .btn-apagar {
-      border: 1px solid #a00;
-      color: #a00;
-      background: none;
-      padding: 4px 10px;
-      border-radius: 6px;
-      cursor: pointer;
-      font-weight: 600;
-    }
-    .btn-apagar:hover {
-      background: #a00;
-      color: #fff;
-    }
-  </style>
+  <script>
+    const SUPABASE_URL = 'https://vwnzmmyoesrjqpthsstg.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ3bnptbXlvZXNyanFwdGhzc3RnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE5NTIyMTAsImV4cCI6MjA3NzUyODIxMH0.F6z3GoZbC-htwzOZSlOnwZUbVOSbgCSbeFE1qskQihw';
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-  <script src="script.js" defer></script>
+    const tbody = document.querySelector('#tabelaInscricoes tbody');
+
+    async function carregarInscricoes() {
+      const { data, error } = await supabase.from('inscricoes').select('*').order('id', { ascending: false });
+
+      if (error) {
+        console.error(error);
+        alert('Erro ao carregar inscrições.');
+        return;
+      }
+
+      tbody.innerHTML = '';
+      data.forEach((item) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${item.nome}</td>
+          <td>${item.idade}</td>
+          <td>${item.documento}</td>
+          <td>${item.telefone}</td>
+          <td>${item.email}</td>
+          <td>${item.area}</td>
+          <td>${item.motivo}</td>
+          <td>${item.descricao}</td>
+          <td><button onclick="excluir(${item.id})">Excluir</button></td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    async function excluir(id) {
+      if (!confirm('Deseja excluir esta inscrição?')) return;
+      const { error } = await supabase.from('inscricoes').delete().eq('id', id);
+      if (error) alert('Erro ao excluir.');
+      else carregarInscricoes();
+    }
+
+    carregarInscricoes();
+  </script>
 </body>
 </html>
