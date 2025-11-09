@@ -295,3 +295,40 @@ Enviado: ${d.enviado_em ? new Date(d.enviado_em).toLocaleString() : ''}
     );
   }
 });
+
+// === CARROSSEL DAS OPERAÇÕES ===
+document.addEventListener("DOMContentLoaded", () => {
+  const carousel = document.querySelector(".carousel");
+  const cards = document.querySelectorAll(".carousel .card");
+  const prevBtn = document.getElementById("prevBtn");
+  const nextBtn = document.getElementById("nextBtn");
+  const dots = document.querySelectorAll(".dot");
+
+  if (!carousel || cards.length === 0) return;
+
+  let index = 0;
+  const total = cards.length;
+  const cardsPerView = 3; // Ajusta conforme o CSS responsivo
+  const maxIndex = Math.ceil(total / cardsPerView) - 1;
+
+  function updateCarousel() {
+    const offset = index * -100;
+    carousel.style.transform = `translateX(${offset}%)`;
+    dots.forEach(dot => dot.classList.remove("active"));
+    if (dots[index]) dots[index].classList.add("active");
+  }
+
+  prevBtn.addEventListener("click", () => {
+    index = (index - 1 + (maxIndex + 1)) % (maxIndex + 1);
+    updateCarousel();
+  });
+
+  nextBtn.addEventListener("click", () => {
+    index = (index + 1) % (maxIndex + 1);
+    updateCarousel();
+  });
+
+  // Ativa o primeiro
+  updateCarousel();
+});
+
